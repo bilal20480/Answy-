@@ -100,7 +100,7 @@ if (document.getElementById("chat-container")) {
   addBotMessage(`Hello, I'm ${currentPersona.name}. Let's chat!`);
 
   sendBtn.addEventListener("click", sendMessage);
-  userInput.addEventListener("keypress", e => { if (e.key === "Enter") sendMessage(); });
+  userInput.addEventListener("keyps", e => { if (e.key === "Enter") sendMessage(); });
 
   function sendMessage() {
     const msg = userInput.value.trim();
@@ -108,7 +108,7 @@ if (document.getElementById("chat-container")) {
     addUserMessage(msg);
     userInput.value = "";
     showTyping();
-    fetchAIResponse(msg).then(resp => {
+    fetchAIponse(msg).then(resp => {
       removeTyping();
       addBotMessage(resp);
     }).catch(() => {
@@ -122,16 +122,14 @@ if (document.getElementById("chat-container")) {
     const contents = `${role}\nUser: ${userMsg}\nReply concisely in 1–2 sentences only.`;
 
     try {
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: contents }] }]
-          })
-        }
-      );
+     const response = await fetch(
+  `/.netlify/functions/proxy`,
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ model: MODEL, prompt: contents })
+  }
+);
 
       const data = await response.json();
       let text = "";
