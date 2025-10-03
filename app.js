@@ -118,35 +118,35 @@ if (document.getElementById("chat-container")) {
   }
 
   async function fetchAIResponse(userMsg) {
-    const role = personaPrompts[currentPersona.id] || "You are a helpful assistant.";
-    const contents = `${role}\nUser: ${userMsg}\nReply concisely in 1–2 sentences only.`;
+  const role = personaPrompts[currentPersona.id] || "You are a helpful assistant.";
+  const contents = `${role}\nUser: ${userMsg}\nReply concisely in 1–2 sentences only.`;
 
-    try {
-     const response = await fetch(
-  `/.netlify/functions/proxy`,
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: MODEL, prompt: contents })
-  }
-);
+  try {
+    // 🔐 call your Netlify function instead of Google directly
+    const response = await fetch("/.netlify/functions/proxy", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ model: MODEL, prompt: contents })
+    });
 
-      const data = await response.json();
-      let text = "";
-      if (data?.candidates?.length > 0) {
-        const cand = data.candidates[0];
-        if (cand.content?.parts?.length > 0) {
-          text = cand.content.parts.map(p => p.text || "").join(" ").trim();
-        } else if (cand.output) {
-          text = cand.output;
-        }
+    const data = await response.json();
+
+    let text = "";
+    if (data?.candidates?.length > 0) {
+      const cand = data.candidates[0];
+      if (cand.content?.parts?.length > 0) {
+        text = cand.content.parts.map(p => p.text || "").join(" ").trim();
+      } else if (cand.output) {
+        text = cand.output;
       }
-      return text || "⚠️ No response text received.";
-    } catch (err) {
-      console.error("❌ Gemini API error:", err);
-      return "⚠️ Error fetching response.";
     }
+    return text || "⚠️ No response text received.";
+  } catch (err) {
+    console.error("❌ Proxy error:", err);
+    return "⚠️ Error fetching response.";
   }
+}
+
 
   function addUserMessage(text) {
     const d = document.createElement("div");
