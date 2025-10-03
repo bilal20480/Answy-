@@ -1,5 +1,5 @@
 // ================== CONFIG ==================
-const API_KEY = "AIzaSyBYhKY9MQgCDX__BoKqvqx6z30VlnIAdsA";
+
 const MODEL = "gemini-2.5-flash";
 
 // Default Personas
